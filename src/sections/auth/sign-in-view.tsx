@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -13,16 +12,36 @@ import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
 
+import { useAuthContext } from '../../contexts/AuthContext';
+
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-  const router = useRouter();
+  useRouter();
+  const { login } = useAuthContext();
+
 
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('kesadmin@demo.com');
+  const [password, setPassword] = useState('2016');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const handleSignIn = useCallback(async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    // Simuler un appel API pour l'authentification
+    try {
+      const tokens = await login(email, password);
+      console.log('Connecté avec succès', tokens);
+    } catch (err) {
+      setError('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [email, login, password]);
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -30,20 +49,22 @@ export function SignInView() {
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
 
       <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
+        Mot de passe oublié ?
       </Link>
 
       <TextField
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         InputProps={{
@@ -58,6 +79,12 @@ export function SignInView() {
         sx={{ mb: 3 }}
       />
 
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <LoadingButton
         fullWidth
         size="large"
@@ -65,8 +92,9 @@ export function SignInView() {
         color="inherit"
         variant="contained"
         onClick={handleSignIn}
+        loading={isLoading}
       >
-        Sign in
+        Se connecter
       </LoadingButton>
     </Box>
   );
@@ -74,37 +102,12 @@ export function SignInView() {
   return (
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Sign in</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
-          </Link>
-        </Typography>
+        <Typography variant="h5">Se Connecter</Typography>
       </Box>
 
-      {renderForm}
-
-      <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-        <Typography
-          variant="overline"
-          sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
-        >
-          OR
-        </Typography>
-      </Divider>
-
-      <Box gap={1} display="flex" justifyContent="center">
-        <IconButton color="inherit">
-          <Iconify icon="logos:google-icon" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="eva:github-fill" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="ri:twitter-x-fill" />
-        </IconButton>
-      </Box>
+      <form onSubmit={handleSignIn}>
+        {renderForm}
+      </form>
     </>
   );
 }

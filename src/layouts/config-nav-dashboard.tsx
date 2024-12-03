@@ -14,6 +14,11 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
+    title: 'Clock',
+    path: '/clock',
+    icon: icon('ic-time'),
+  },
+  {
     title: 'User',
     path: '/user',
     icon: icon('ic-user'),
@@ -32,6 +37,11 @@ export const navData = [
     title: 'Blog',
     path: '/blog',
     icon: icon('ic-blog'),
+    info: (
+      <Label color="error" variant="inverted">
+        +3
+      </Label>
+    ),
   },
   {
     title: 'Sign in',

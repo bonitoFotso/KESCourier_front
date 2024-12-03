@@ -8,9 +8,14 @@ import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
+import { PublicRoute } from './PublicRoute';
+import { PrivateRoute } from './PrivateRoute';
+
 // ----------------------------------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
+export const ClockPage = lazy(() => import('src/pages/Clock'));
+
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
@@ -38,12 +43,15 @@ export function Router() {
       element: (
         <DashboardLayout>
           <Suspense fallback={renderFallback}>
-            <Outlet />
+            <PrivateRoute>
+              <Outlet />
+            </PrivateRoute>
           </Suspense>
         </DashboardLayout>
       ),
       children: [
         { element: <HomePage />, index: true },
+        { path: 'clock', element: <ClockPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
@@ -53,7 +61,9 @@ export function Router() {
       path: 'sign-in',
       element: (
         <AuthLayout>
-          <SignInPage />
+          <PublicRoute>
+            <SignInPage />
+          </PublicRoute>
         </AuthLayout>
       ),
     },
